@@ -1,0 +1,13 @@
+{
+    "files.exclude": {
+        "**/*.zip": true,
+        "**/*.csv": true,
+        "aws-adfs": true,
+        "**/*.txt": true,
+        "*issues.json": true,
+        "**/node_modules": true,
+        "*.pbix": true,
+        ".scannerwork":true,
+        "**/dist": true
+    }
+}

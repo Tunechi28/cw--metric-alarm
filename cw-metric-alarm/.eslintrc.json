@@ -1,0 +1,43 @@
+{
+    "env": {
+        "node": true,
+        "es6": true
+    },
+    "parserOptions": {
+        "sourceType": "module",
+        "ecmaVersion": 8
+    },
+    "rules": {
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi": [
+            "error",
+            "always"
+        ],
+        /* Code */
+        "no-var": "error",
+        "one-var": ["error", { "let": "never", "const": "never" }],
+        "prefer-const": "error",
+        "no-useless-constructor": "error",
+        "no-eval": "error",
+        "no-implied-eval": "error",
+        "no-loop-func": "error",
+        "no-native-reassign": "error",
+        "no-extend-native": "error",
+        "no-new-func": "error",
+        "eqeqeq": "error",
+        
+        /* Code Formatting */
+        "curly": "warn",
+        "template-curly-spacing": "warn",
+        "keyword-spacing": "warn",
+        "arrow-spacing": "warn",
+        "arrow-parens": ["error", "as-needed", { "requireForBlockBody": true }],
+        "no-trailing-spaces": "warn",
+        "space-before-blocks": "warn",
+        "indent": ["warn", 4, { "SwitchCase": 1}],
+        "padded-blocks" : ["warn", "never"]
+    }
+}
