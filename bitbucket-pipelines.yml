@@ -1,0 +1,24 @@
+image:
+  name: node:10.15.0
+
+definitions:
+  steps:
+    - step: &cw-metric-alarm
+        name: Basic lint and webpack testing
+        services:
+        caches:
+        script:
+          - cd cw-metric-alarm
+          - npm install
+          - npm run lint
+          - npx webpack
+
+
+pipelines:
+  default:
+    - parallel:
+        - step: *cw-metric-alarm
+  branches:
+    master:
+      - parallel:
+          - step: *cw-metric-alarm
