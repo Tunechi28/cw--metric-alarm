@@ -25,7 +25,7 @@ role="arn:aws:iam::588237033746:role/$role_name"
 
 if [ -n "$1" ]; then
 	if [[ $1 == "production" || $1 == "staging" ]]; then
-		role="arn:aws:iam::967545767730:role/$function_name-role"
+		role="arn:aws:iam::967545767730:role/$role_name"
 	fi
 fi
 
