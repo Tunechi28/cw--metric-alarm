@@ -61,11 +61,8 @@ if [ `aws lambda list-functions | grep $function_name | wc -l` -gt 0 ]; then
         --publish \
 		--region $region
   
-  	##aws lambda update-function-configuration \
-      ##  --function-name $function_name
-
-        ### Complete
-        echo "Lambda Update Complete"
+    ### Complete
+    echo "Lambda Update Complete"
 else
 	### Create the lambda function
 	echo "Creating Lambda Function"
