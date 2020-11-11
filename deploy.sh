@@ -41,13 +41,13 @@ echo "Region:          "$region
 echo
 
 ### Install package dependencies
-npm install --loglevel=error --prefix $function_name
+npm install --loglevel=error --prefix $function_name_prefix
 
 ### Create the lambda package
-cd $function_name
+cd $function_name_prefix
 echo Running webpack...
 npx webpack
-zip -9 -u -j dist/$function_name.zip dist/*
+zip -9 -u -j dist/$function_name_prefix.zip dist/*
 
 ### Check if the function already exists
 if [ `aws lambda list-functions | grep $function_name | wc -l` -gt 0 ]; then
