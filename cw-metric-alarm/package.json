@@ -11,8 +11,7 @@
   },
   "dependencies": {
     "aws-sdk": "^2.683.0",
-    "request": "^2.88.2",
-    "request-promise": "^4.2.5",
+    "got": "^11.8.0",
     "winston": "^3.3.3"
   },
   "devDependencies": {
