@@ -29,7 +29,7 @@ async function parseAlarm(alarm) {
     if (alarm['Event Source'] === 'replication-task') {
         //This is a DMS Alarm
         return await parseDMSAlarm(alarm);
-    } else if (config.ec2AlarmNamespace.includes(alarm.Trigger.Namespace)) {
+    } else if (config.config.ec2AlarmNamespace.includes(alarm.Trigger.Namespace)) {
         //This is an EC2 alarm (CPU, Disk, Instance State)
         return await parseEC2Alarm(alarm);
     }
