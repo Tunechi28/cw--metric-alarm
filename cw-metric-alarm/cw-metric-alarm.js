@@ -17,7 +17,7 @@ function handler(event, context, callback) {
             const alarm = await parseAlarm(JSON.parse(message));
 
             //Post to Slack
-            await slack.post(alarm, slackUrl);
+            await slack.post(alarm);
         } catch (e) {
             logger.error(`Exception caught in handler: ${e}`);
             callback(error);
