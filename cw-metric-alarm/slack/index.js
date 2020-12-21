@@ -1,5 +1,6 @@
-const rp = require('got');
+const got = require('got');
 const logger = require('../logger').log;
+const config = require('../config').config;
 
 const post = async function(alarm) {
     try {
