@@ -1,27 +1,20 @@
-const rp = require('request-promise');
+const got = require('got');
 const logger = require('../logger').log;
+const config = require('../config').config;
 
-const post = async function(alarm, slackUrl) {
+const post = async function(alarm) {
     try {
         const options = {
             method: 'POST',
-            uri: slackUrl,
             body: JSON.stringify(buildPayload(alarm)),
             encoding: 'utf8'
         };
 
-        return rp(options)
-            .then( () => {
-                logger.info('Slack notification complete');
-                return;
-            })
-            .catch( function(err) {
-                logger.error(`Slack notification error occurred: ${err}`);
-                return;
-            });
-    } catch (e) {
-        logger.error(`Slack POST error: ${e}`);
-        return Promise.reject();
+        await got(config.slackUrl, options);
+        logger.info('Slack POST complete');
+    } catch (error) {
+        logger.error(`Slack POST error: ${error}`);
+        return error;
     }
 };
 

@@ -3,11 +3,12 @@ AWS.config.update({ region: process.env.REGION });
 const slack = require('./slack');
 const logger = require('./logger').log;
 const config = require('./config');
-const paramCache = {};
 
 function handler(event, context, callback) {
     (async () => {
         try {
+            await config.init();
+
             //Receive message from SNS topic
             const message = event.Records[0].Sns.Message;
             logger.info(message);
@@ -16,8 +17,7 @@ function handler(event, context, callback) {
             const alarm = await parseAlarm(JSON.parse(message));
 
             //Post to Slack
-            const slackUrl = await getParam(process.env.SLACKURLPARAM);
-            await slack.post(alarm, slackUrl);
+            await slack.post(alarm);
         } catch (e) {
             logger.error(`Exception caught in handler: ${e}`);
             callback(error);
@@ -29,7 +29,7 @@ async function parseAlarm(alarm) {
     if (alarm['Event Source'] === 'replication-task') {
         //This is a DMS Alarm
         return await parseDMSAlarm(alarm);
-    } else if (config.ec2AlarmNamespace.includes(alarm.Trigger.Namespace)) {
+    } else if (config.config.ec2AlarmNamespace.includes(alarm.Trigger.Namespace)) {
         //This is an EC2 alarm (CPU, Disk, Instance State)
         return await parseEC2Alarm(alarm);
     }
@@ -137,30 +137,6 @@ async function parseGeneralAlarm(alarm) {
         alarmLevel: alarmLevel,
         namespace: alarm.Trigger.Namespace
     };
-}
-
-//TODO: This should be moved to the config module
-async function getParam(paramName) {
-    if (paramName in paramCache) {
-        logger.info(`${paramName} found in cache.`);
-        return paramCache[paramName];
-    } else {
-        logger.info(`${paramName} not found in cache. Getting value from Parameter Store.`);
-        try {
-            const parameterStore = new AWS.SSM({ region: process.env.REGION });
-            const params = {
-                Name: paramName,
-                WithDecryption: true
-            };
-            const request = await parameterStore.getParameter(params).promise();
-            logger.info('Updating cache with value from Parameter Store.');
-            paramCache[paramName] = request.Parameter.Value;
-            return request.Parameter.Value;
-        }
-        catch (e) {
-            logger.error(`Unable to retrieve parameter from SSM. Param Name: ${paramName}. Error: ${e}`);
-        }
-    }
 }
 
 async function lookupInstanceRole(instanceId) {
