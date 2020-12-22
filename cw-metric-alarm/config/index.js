@@ -12,7 +12,7 @@ async function init() {
         config.slackUrl = await getParam(process.env.SLACKURLPARAM);
     }
     catch (e) {
-        console.log('Unable to set slackUrl configuration value');
+        console.log(`Unable to set slackUrl configuration value. Error: ${e}`);
         throw e;
     }
 }
