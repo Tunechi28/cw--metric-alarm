@@ -151,6 +151,12 @@ async function lookupInstanceRole(instanceId) {
             return ':sqlserver: SQL Server';
         case 'vip_web':
             return ':iis: IIS';
+        case 'domain-controller':
+            return ':domain-controller: domain-controller';
+        case 'utility':
+            return ':hammer_and_wrench: utility';
+        case 'demo':
+            return ':demo: demo';
         default:
             return '';
     }
