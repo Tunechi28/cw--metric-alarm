@@ -2,7 +2,7 @@
 ### Ensure the variable AWS_ACCOUNT_ID is set
 # http://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
 
-if ! [[ "$1" =~ ^(dev|staging|production)$ ]]; then
+if ! [[ "$1" =~ ^(dev|staging|production|shared-services)$ ]]; then
     echo "$1 is not a valid environment."
     exit 1
 fi
@@ -63,22 +63,4 @@ if [ `aws lambda list-functions | grep $function_name | wc -l` -gt 0 ]; then
   
     ### Complete
     echo "Lambda Update Complete"
-else
-	### Create the lambda function
-	echo "Creating Lambda Function"
-
-	aws lambda create-function \
-  	--function-name $function_name \
-  	--handler $handler_name \
-  	--runtime $runtime \
-  	--memory 128 \
-  	--timeout 120 \
-  	--role $role \
-  	--zip-file fileb://dist/$package_file \
-  	--description "$function_name" \
-	--region $region
-
-	#### Complete
-	rm -f $package_file
-	echo "Lambda Creation Complete"
 fi
