@@ -152,11 +152,11 @@ async function lookupInstanceRole(instanceId) {
         case 'vip_web':
             return ':iis: IIS';
         case 'domain-controller':
-            return ':domain-controller: domain-controller';
+            return ':domain-controller: Domain Controller';
         case 'utility':
-            return ':hammer_and_wrench: utility';
+            return ':hammer_and_wrench: Utility Server';
         case 'demo':
-            return ':demo: demo';
+            return ':demo: Demo Server';
         default:
             return '';
     }
