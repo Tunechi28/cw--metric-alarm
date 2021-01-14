@@ -1,3 +1,6 @@
+const AWS = require('aws-sdk');
+AWS.config.update({ region: process.env.REGION });
+
 async function getAlarmLevel(description) {
     let alarmLevel = 'Warning';
     const regex = /.*(warning|critical).*/gi;
@@ -52,8 +55,25 @@ async function simplifyComparisonOperator(operator) {
     return result;
 }
 
+async function lookupTagValue(instanceId, tag) {
+    try {
+        const ec2 = new AWS.EC2();
+        const params = {
+            InstanceIds: [
+                instanceId
+            ]
+        };
+        const result = await ec2.describeInstances(params).promise();
+        return result.Reservations[0].Instances[0] !== null ? result.Reservations[0].Instances[0].Tags.find(x => x.Key === tag).Value : 'Unknown';
+    } catch (e) {
+        logger.error(`Unable to retrieve value for tag: ${tag}. Error: ${e}`);
+        return 'Unknown';
+    }
+}
+
 module.exports = {
     getAlarmLevel,
     lookupInstanceRole,
+    lookupTagValue,
     simplifyComparisonOperator
 };

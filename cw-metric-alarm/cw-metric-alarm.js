@@ -1,5 +1,3 @@
-const AWS = require('aws-sdk');
-AWS.config.update({ region: process.env.REGION });
 const slack = require('./slack');
 const logger = require('./logger').log;
 const config = require('./config');
@@ -102,7 +100,7 @@ async function parseEC2Alarm(alarm) {
         instanceId,
         alarmLevel: await util.getAlarmLevel(alarm.AlarmDescription),
         alarmNarrative: alarmNarrative,
-        instanceName: await lookupTagValue(instanceId, 'Name'),
+        instanceName: await util.lookupTagValue(instanceId, 'Name'),
         instanceRole: await util.lookupInstanceRole(instanceId)
     };
 }
@@ -124,22 +122,6 @@ async function parseGeneralAlarm(alarm) {
         alarmLevel: await util.getAlarmLevel(alarm.AlarmDescription),
         namespace: alarm.Trigger.Namespace
     };
-}
-
-async function lookupTagValue(instanceId, tag) {
-    try {
-        const ec2 = new AWS.EC2();
-        const params = {
-            InstanceIds: [
-                instanceId
-            ]
-        };
-        const result = await ec2.describeInstances(params).promise();
-        return result.Reservations[0].Instances[0] !== null ? result.Reservations[0].Instances[0].Tags.find(x => x.Key === tag).Value : 'Unknown';
-    } catch (e) {
-        logger.error(`Unable to retrieve value for tag: ${tag}. Error: ${e}`);
-        return 'Unknown';
-    }
 }
 
 module.exports = {
