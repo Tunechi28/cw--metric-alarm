@@ -3,6 +3,7 @@ AWS.config.update({ region: process.env.REGION });
 const slack = require('./slack');
 const logger = require('./logger').log;
 const config = require('./config');
+const util = require('./util');
 
 function handler(event, context, callback) {
     (async () => {
@@ -66,14 +67,7 @@ async function parseEC2Alarm(alarm) {
 
     const instanceId = alarm.Trigger.Dimensions.find(o => o.name === 'InstanceId').value;
 
-    let alarmLevel = '';
-    const regex = /.*(warning|critical).*/gi;
-    const result = regex.exec(alarm.AlarmDescription);
-    if (result) {
-        alarmLevel = result[1];
-    }
-
-    const operator = await simplifyComparisonOperator(alarm.Trigger.ComparisonOperator);
+    const operator = await util.simplifyComparisonOperator(alarm.Trigger.ComparisonOperator);
 
     let alarmNarrative = '';
     if (alarm.Trigger.MetricName === 'LogicalDisk % Free Space') {
@@ -106,22 +100,15 @@ async function parseEC2Alarm(alarm) {
         threshold: alarm.Trigger.Threshold,
         reason: alarm.NewStateReason,
         instanceId,
-        alarmLevel: alarmLevel,
+        alarmLevel: await util.getAlarmLevel(alarm.AlarmDescription),
         alarmNarrative: alarmNarrative,
         instanceName: await lookupTagValue(instanceId, 'Name'),
-        instanceRole: await lookupInstanceRole(instanceId)
+        instanceRole: await util.lookupInstanceRole(instanceId)
     };
 }
 
 async function parseGeneralAlarm(alarm) {
     logger.info('Alarm Type: General');
-
-    let alarmLevel = '';
-    const regex = /.*(warning|critical).*/gi;
-    const result = regex.exec(alarm.AlarmDescription);
-    if (result) {
-        alarmLevel = result[1];
-    }
 
     return {
         alarmType: 'General',
@@ -134,32 +121,9 @@ async function parseGeneralAlarm(alarm) {
         period: alarm.Trigger.Period,
         threshold: alarm.Trigger.Threshold,
         reason: alarm.NewStateReason,
-        alarmLevel: alarmLevel,
+        alarmLevel: await util.getAlarmLevel(alarm.AlarmDescription),
         namespace: alarm.Trigger.Namespace
     };
-}
-
-async function lookupInstanceRole(instanceId) {
-    const instanceRole = await lookupTagValue(instanceId, 'Type');
-
-    switch (instanceRole) {
-        case 'vip_imosapp':
-            return ':imosapp: IMOS App';
-        case 'vip_imosmsg':
-            return ':imosmsg: IMOS Msg';
-        case 'sqlserver':
-            return ':sqlserver: SQL Server';
-        case 'vip_web':
-            return ':iis: IIS';
-        case 'domain-controller':
-            return ':domain-controller: Domain Controller';
-        case 'utility':
-            return ':hammer_and_wrench: Utility Server';
-        case 'demo':
-            return ':demo: Demo Server';
-        default:
-            return '';
-    }
 }
 
 async function lookupTagValue(instanceId, tag) {
@@ -176,26 +140,6 @@ async function lookupTagValue(instanceId, tag) {
         logger.error(`Unable to retrieve value for tag: ${tag}. Error: ${e}`);
         return 'Unknown';
     }
-}
-
-async function simplifyComparisonOperator(operator) {
-    switch (operator) {
-        case 'GreaterThanOrEqualToThreshold':
-            result = '>=';
-            break;
-        case 'GreaterThanThreshold':
-            result = '>';
-            break;
-        case 'LessThanThreshold':
-            result = '<';
-            break;
-        case 'LessThanOrEqualToThreshold':
-            result = '<=';
-            break;
-        default:
-            result = operator;
-    }
-    return result;
 }
 
 module.exports = {
